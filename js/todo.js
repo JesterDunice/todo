@@ -1,7 +1,7 @@
 $(document).ready(function () {
   $("#search").keyup(function (event) {
     if (($("#search").val() != '') && (event.keyCode == 13)) {
-      NewTask(),
+      NewTask();
       RenameTasks();
     }
   });
@@ -9,19 +9,19 @@ $(document).ready(function () {
 
 function AddTask() {
     if ($("#search").val() != '') {
-      NewTask(),
-        RenameTasks();
+      NewTask();
+      RenameTasks();
     }
 };
 
 function NewTask() {
   $("<li/>", {
-    "class": "new-task",
+    "class": "new-task"
   })
     .appendTo('.todo-list')
     .append(
       $("<input/>", {
-        "class": "ch-b",
+        "class": "cb",
         type: "checkbox"
       }),
       $("<label/>", {
@@ -38,12 +38,18 @@ function NewTask() {
 function RenameTasks() {
   var i = 1,
       quantitytasks = ($('li').length);
+
   while (i < quantitytasks) {
-    while(i < 10){
-      $('li')[i-1].id = "fred-0" + i,
-        ++i
-    }
-    $('li')[i-1].id = "fred-" + i,
+    $('li')[i - 1].id = "fred-" + i;
+      ++i;
+  }
+}
+
+function CheckAll() {
+  var i = 0,
+    quantitytasks = ($('input:checkbox').length) - 1;
+  while (i < quantitytasks) {
+    $('input:checkbox')[i].checked = true;
     ++i
   }
 }
