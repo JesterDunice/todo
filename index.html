@@ -1,16 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <title>TODO</title>
   <link rel="stylesheet" href="css/style.css"/>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width; initial-scale=0.85; maximum-scale=0.85; user-scalable=0;">
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <title>Home</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="js/todo.js"></script>
 </head>
 
 <body>
+  <div class="todo-app">
 
-</div>
+    <input class="new-todo" id="search" placeholder="What needs to be done?" autofocus="">
+    <div class="main">
+    </div>
+    <ul class="todo-list">
+
+    </ul>
+    <div class="control">
+      <button class="ctr-but" id="add-task" onclick="AddTask()">ADD TASK</button>
+    </div>
+
+
+  </div>
 
 </body>
 </html>
