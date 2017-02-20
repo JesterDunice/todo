@@ -80,22 +80,19 @@ function NewTask() {
 
   // rename after dbclk on name of task
   $('.label-task').dblclick(function () {
-    var n = $('.label-task').index($(this));
-    console.log($(n));
-    $('.label-task')[n].attr("contenteditable", true);
-    $('.label-task')[n].keyup(function (event) {
-      if (($('.label-task')[n].val() != '') && (event.keyCode == 13)) {
-        $('.label-task')[n].attr("contenteditable", false);
+    $(this).attr("contenteditable", true);
+    $('.label-task').keydown(function (event) {
+      if (($(this).val() != '') && (event.keyCode == 13)) {
+        $('.label-task').attr("contenteditable", false);
       }
     });
   });
-
 }
 
 function RenameTasks() {
   $('li').each(function(i){
     $(this).attr("id", "fred-" + (i + 1));
-  });
+});
 }
 
 function CtrlCheck() {
