@@ -1,18 +1,35 @@
 $(document).ready(function () {
+  // input name of task and added after press key "Enter" or button "Add task"
   $("#search").keyup(function (event) {
     if (($("#search").val() != '') && (event.keyCode == 13)) {
       NewTask();
       RenameTasks();
     }
   });
-});
 
-function AddTask() {
+  // check/uncheck all tasks
+  $('#foo').click(function () {
+    if ($('ul input:checkbox').length > 0) {
+      if ($('ul input:checked').length === $('ul input:checkbox').length) {
+        $('ul input:checked').each(function (i) {
+          $(this).prop("checked", false);
+        })
+      } else {
+        $('ul input:checkbox').each(function (i) {
+          $(this).prop("checked", true);
+        })
+      }
+    } else $('#foo').prop("checked", false);
+  });
+
+  // add task
+  $('#add-task').click(function () {
     if ($("#search").val() != '') {
       NewTask();
       RenameTasks();
     }
-};
+  });
+});
 
 function NewTask() {
   $("<li/>", {
@@ -30,26 +47,62 @@ function NewTask() {
       }),
       $("<button/>", {
         "class": "destroy"
-      })
-    )
+      }))
+
+  // delete task
+  $('.destroy').click(function () {
+    $(this).parent().remove();
+    // reset ctrl checkbox to unchecked
+    if ($('ul input:checkbox').length === 0) {
+      $('#foo').prop("checked", false);
+    } else {
+      CtrlCheck();
+      RenameTasks();
+    }
+  });
+
+  // check/uncheck ctrl checkbox
+  $('.cb').on('click', CtrlCheck);
+
+  // delete all completed tasks
+  $('#del-all').click(function () {
+    $('.todo-list input:checked').parent().remove();
+    // reset ctrl checkbox to unchecked
+    if ($('ul input:checkbox').length === 0) {
+      $('#foo').prop("checked", false);
+    } else {
+      RenameTasks();
+    }
+  });
+
+  //clear input text area
   $('#search').val('');
-};
+
+  // rename after dbclk on name of task
+  $('.label-task').dblclick(function () {
+    var n = $('.label-task').index($(this));
+    console.log($(n));
+    $('.label-task')[n].attr("contenteditable", true);
+    $('.label-task')[n].keyup(function (event) {
+      if (($('.label-task')[n].val() != '') && (event.keyCode == 13)) {
+        $('.label-task')[n].attr("contenteditable", false);
+      }
+    });
+  });
+
+}
 
 function RenameTasks() {
-  var i = 1,
-      quantitytasks = ($('li').length);
+  $('li').each(function(i){
+    $(this).attr("id", "fred-" + (i + 1));
+  });
+}
 
-  while (i < quantitytasks) {
-    $('li')[i - 1].id = "fred-" + i;
-      ++i;
+function CtrlCheck() {
+  if ($('ul input:checked').length === $('ul input:checkbox').length) {
+    $('#foo').prop("checked", true);
+  } else {
+    $('#foo').prop("checked", false);
   }
 }
 
-function CheckAll() {
-  var i = 0,
-    quantitytasks = ($('input:checkbox').length) - 1;
-  while (i < quantitytasks) {
-    $('input:checkbox')[i].checked = true;
-    ++i
-  }
-}
