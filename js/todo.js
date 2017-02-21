@@ -10,6 +10,9 @@ $(document).ready(function () {
     }
   });
 
+  // initial counting of tasks
+  Counters();
+
   // check/uncheck all tasks
   $('#ctrl-cb').click(function () {
     var cbox = $('ul input:checkbox').length,
@@ -35,8 +38,6 @@ $(document).ready(function () {
       RenameTasks();
     }
   });
-  // Counters of tasks
-  Counters();
 
   //events on ul
   // delete task
@@ -110,14 +111,22 @@ $(document).ready(function () {
       $(this).toggleClass("hidden-li");
     });
   });
+
+
+  $('#ml').on('click', AddLinks);
+
+
+  //pageshow
+  $('.page-ctrl').on('click', '.page-links', PageShow);
+
 });
 
 // add new task
 function NewTask() {
+  if ($('li').length < 5){
   $("<li/>", {
-    "class": "new-task"
-  })
-    .appendTo('.todo-list')
+    "class": "new-task page-vi"
+  }).appendTo('.todo-list')
     .append(
       $("<input/>", {
         "class": "cb",
@@ -130,7 +139,24 @@ function NewTask() {
       $("<button/>", {
         "class": "destroy",
         text: "x"
-      }))
+      }))}
+  else {$("<li/>", {
+    "class": "new-task"
+  }).appendTo('.todo-list')
+    .append(
+      $("<input/>", {
+        "class": "cb",
+        type: "checkbox"
+      }),
+      $("<label/>", {
+        "class": "label-task",
+        text: $("#search").val()
+      }),
+      $("<button/>", {
+        "class": "destroy",
+        text: "x"
+      }))}
+
   //clear input text area
   $('#search').val('');
 }
@@ -157,4 +183,56 @@ function Counters() {
   $('#all-counter').text("All: " + a);
   $("#comp-counter").text("Completed: " + b);
   $("#notcomp-counter").text("Active: " + c);
+  AddLinks();
+  PageShowAfter();
 };
+
+var PAGE_LENGTH = 5;
+
+// create hlinks
+function AddLinks(){
+  var l = $('ul li').length,
+      n = PAGE_LENGTH,
+      m = Math.floor(l/n);  // количество полных старниц
+  if ((l%n) != 0) { m++; } // проверка на неполную страницу в конце
+  $('.page-ctrl a').remove();
+  for(var i = 0; i < m; i++) {
+    $("<a/>", {
+      href: "#",
+      "class": "page-links",
+      text: i + 1
+    }).appendTo('.page-ctrl');
+  }
+}
+
+// show 1 page
+function PageShow(event) {
+  var a = $(event.target).index(),
+      n = PAGE_LENGTH;
+  $('.page-vi').each(function (i) {
+    $(this).toggleClass("page-vi");
+  });
+  $('.new-task').each(function (i) {
+    if (i >= (a * n) && i < (a * n + 5)) {
+      $(this).toggleClass("page-vi");
+    }
+  })
+  PageShowAfter();
+}
+
+// show page
+function PageShowAfter() {
+  var a = $('li').index($('.page-vi')[0]),
+      n = PAGE_LENGTH;
+  console.log(a);
+  $('.page-vi').each(function (i) {
+    $(this).toggleClass("page-vi");
+  });
+  $('.new-task').each(function (i) {
+    if (i >= (a) && i < (a + 5)) {
+      $(this).toggleClass("page-vi");
+    }
+  })
+}
+
+
