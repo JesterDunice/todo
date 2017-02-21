@@ -14,14 +14,11 @@ body{
 .new-todo{
   background: #8bd9d9;
   border: none;
+  color: #447777;
   font-size: inherit;
   height: 60px;
   padding: 0 0 0 10px;
   width: calc(100% - 10px);
-}
-
-.new-todo::-webkit-input-placeholder{
-
 }
 
 .todo-list{
@@ -36,6 +33,10 @@ body{
   width: 100%;
   height: 50px;
   background: #447777;
+}
+
+.hidden-li{
+  display: none;
 }
 
 .label-task{
@@ -81,9 +82,14 @@ body{
 
 .counter-label{
   display: inline-block;
+  color: #447777;
   font-family: inherit;
   font-size: inherit;
   height: 100%;
-  vertical-align: baseline;
-  width: 32%;
+  margin-top: 20px;
+  width: 40%;
+}
+.counter-label:first-child{
+  padding-left: 10px;
+  width: 15%;
 }
