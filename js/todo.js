@@ -12,8 +12,10 @@ $(document).ready(function () {
 
   // check/uncheck all tasks
   $('#ctrl-cb').click(function () {
-    if ($('ul input:checkbox').length > 0) {
-      if ($('ul input:checked').length === $('ul input:checkbox').length) {
+    var cbox = $('ul input:checkbox').length,
+        cdbox = $('ul input:checked').length;
+    if (cbox > 0) {
+      if (cdbox === cbox) {
         $('ul input:checked').each(function (i) {
           $(this).prop("checked", false);
         })
@@ -83,7 +85,7 @@ $(document).ready(function () {
     }
   });
   // show only completed
-  $('#Only-completed').on('click', function(){
+  $('#Completed').on('click', function(){
     $('.hidden-li').each(function (i) {
       $(this).toggleClass("hidden-li");
     });
@@ -94,7 +96,7 @@ $(document).ready(function () {
     });
   });
   // show only not completed
-  $('#Only-not-completed').on('click', function(){
+  $('#Active').on('click', function(){
       $('.hidden-li').each(function (i) {
         $(this).toggleClass("hidden-li");
       });
@@ -154,5 +156,5 @@ function Counters() {
     c = a - b;
   $('#all-counter').text("All: " + a);
   $("#comp-counter").text("Completed: " + b);
-  $("#notcomp-counter").text("Not completed: " + c);
+  $("#notcomp-counter").text("Active: " + c);
 };

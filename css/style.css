@@ -87,9 +87,9 @@ body{
   font-size: inherit;
   height: 100%;
   margin-top: 20px;
-  width: 40%;
+  width: 35%;
 }
 .counter-label:first-child{
-  padding-left: 10px;
-  width: 15%;
+  padding-left: 20px;
+  width: 20%;
 }
