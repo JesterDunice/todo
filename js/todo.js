@@ -6,11 +6,12 @@ $(document).ready(function () {
     if (($("#search").val() != '') && (event.keyCode == 13)) {
       NewTask();
       RenameTasks();
+      Counters();
     }
   });
 
   // check/uncheck all tasks
-  $('#foo').click(function () {
+  $('#ctrl-cb').click(function () {
     if ($('ul input:checkbox').length > 0) {
       if ($('ul input:checked').length === $('ul input:checkbox').length) {
         $('ul input:checked').each(function (i) {
@@ -21,7 +22,7 @@ $(document).ready(function () {
           $(this).prop("checked", true);
         })
       }
-    } else $('#foo').prop("checked", false);
+    } else $('#ctrl-cb').prop("checked", false);
   });
 
   // add task
@@ -31,6 +32,8 @@ $(document).ready(function () {
       RenameTasks();
     }
   });
+  // Counters of tasks
+  Counters();
 });
 
 function NewTask() {
@@ -57,7 +60,7 @@ function NewTask() {
     $(this).parent().remove();
     // reset ctrl checkbox to unchecked
     if ($('ul input:checkbox').length === 0) {
-      $('#foo').prop("checked", false);
+      $('#ctrl-cb').prop("checked", false);
     } else {
       CtrlCheck();
       RenameTasks();
@@ -72,7 +75,7 @@ function NewTask() {
     $('.todo-list input:checked').parent().remove();
     // reset ctrl checkbox to unchecked
     if ($('ul input:checkbox').length === 0) {
-      $('#foo').prop("checked", false);
+      $('#ctrl-cb').prop("checked", false);
     } else {
       RenameTasks();
     }
@@ -89,7 +92,7 @@ function NewTask() {
     $(this).focus();
     $('.label-task').keydown(function (event) {
       if ((event.keyCode == 13)) {
-        $('.label-task').attr("contenteditable", false);
+        $(window.lb).attr("contenteditable", false);
       }
     });
   });
@@ -98,7 +101,7 @@ function NewTask() {
     var lab = window.lb;       // тут указываем ID элемента
     if (!$(lab).is(event.target)                 // если клик был не по нашему блоку
       && $(lab).has(event.target).length === 0){ // и не по его дочерним элементам
-      $(lab).attr("contenteditable", false); // скрываем его
+      $(lab).attr("contenteditable", false); // меняем его аттрибут
     }
   });
 }
@@ -111,9 +114,17 @@ function RenameTasks() {
 
 function CtrlCheck() {
   if ($('ul input:checked').length === $('ul input:checkbox').length) {
-    $('#foo').prop("checked", true);
+    $('#ctrl-cb').prop("checked", true);
   } else {
-    $('#foo').prop("checked", false);
+    $('#ctrl-cb').prop("checked", false);
   }
 }
 
+function Counters() {
+  var a = $('ul input:checkbox').length,
+    b = $('ul input:checked').length,
+    c = a - b;
+  $('#all-counter').text("All: " + a);
+  $("#comp-counter").text("Completed: " + b);
+  $("#notcomp-counter").text("Not completed: " + c);
+};

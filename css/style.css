@@ -67,3 +67,23 @@ body{
   margin-top: 10px;
   width: 30px;
 }
+
+.destroy:hover{
+  cursor: pointer;
+  filter: hue-rotate(45deg);
+}
+
+.counters{
+  background: #8BD9D9;
+  height: 60px;
+  width: 100%;
+}
+
+.counter-label{
+  display: inline-block;
+  font-family: inherit;
+  font-size: inherit;
+  height: 100%;
+  vertical-align: baseline;
+  width: 32%;
+}
