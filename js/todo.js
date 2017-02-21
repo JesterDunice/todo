@@ -1,3 +1,5 @@
+var lb;
+
 $(document).ready(function () {
   // input name of task and added after press key "Enter" or button "Add task"
   $("#search").keyup(function (event) {
@@ -46,7 +48,8 @@ function NewTask() {
         text: $("#search").val()
       }),
       $("<button/>", {
-        "class": "destroy"
+        "class": "destroy",
+        text: "x"
       }))
 
   // delete task
@@ -80,12 +83,23 @@ function NewTask() {
 
   // rename after dbclk on name of task
   $('.label-task').dblclick(function () {
+    //window.lb = $('.label-task').index(this);
+    window.lb = $(this);
     $(this).attr("contenteditable", true);
+    $(this).focus();
     $('.label-task').keydown(function (event) {
-      if (($(this).val() != '') && (event.keyCode == 13)) {
+      if ((event.keyCode == 13)) {
         $('.label-task').attr("contenteditable", false);
       }
     });
+  });
+  // click outside of editable label
+  $(document).mouseup(function (event){   // событие клика по веб-документу
+    var lab = window.lb;       // тут указываем ID элемента
+    if (!$(lab).is(event.target)                 // если клик был не по нашему блоку
+      && $(lab).has(event.target).length === 0){ // и не по его дочерним элементам
+      $(lab).attr("contenteditable", false); // скрываем его
+    }
   });
 }
 
