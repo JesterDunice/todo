@@ -40,6 +40,7 @@ body{
   display: none;
 }
 
+
 .page-vi {
   display: block;
 }
@@ -97,4 +98,8 @@ body{
 .counter-label:first-child{
   padding-left: 20px;
   width: 20%;
+}
+
+.page-links-lrg{
+  font-size: 50px;
 }

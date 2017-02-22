@@ -1,4 +1,6 @@
 var lb;
+var PAGE_LENGTH = 5;
+var CURRENT_PAGE = 1;
 
 $(document).ready(function () {
   // input name of task and added after press key "Enter" or button "Add task"
@@ -36,6 +38,7 @@ $(document).ready(function () {
     if ($("#search").val() != '') {
       NewTask();
       RenameTasks();
+      Counters();
     }
   });
 
@@ -123,24 +126,7 @@ $(document).ready(function () {
 
 // add new task
 function NewTask() {
-  if ($('li').length < 5){
   $("<li/>", {
-    "class": "new-task page-vi"
-  }).appendTo('.todo-list')
-    .append(
-      $("<input/>", {
-        "class": "cb",
-        type: "checkbox"
-      }),
-      $("<label/>", {
-        "class": "label-task",
-        text: $("#search").val()
-      }),
-      $("<button/>", {
-        "class": "destroy",
-        text: "x"
-      }))}
-  else {$("<li/>", {
     "class": "new-task"
   }).appendTo('.todo-list')
     .append(
@@ -155,8 +141,7 @@ function NewTask() {
       $("<button/>", {
         "class": "destroy",
         text: "x"
-      }))}
-
+      }))
   //clear input text area
   $('#search').val('');
 }
@@ -184,55 +169,35 @@ function Counters() {
   $("#comp-counter").text("Completed: " + b);
   $("#notcomp-counter").text("Active: " + c);
   AddLinks();
-  PageShowAfter();
+  ShowLi();
 };
 
-var PAGE_LENGTH = 5;
+// show current page
+function ShowLi() {
+  $('.page-links-lrg').toggleClass('page-links-lrg');
+  if ($('.page-vi').length === 0 && (CURRENT_PAGE > 1)) {
+    CURRENT_PAGE--;
+  }
+  $('.page-vi').toggleClass('page-vi');
+  $('li').slice((CURRENT_PAGE - 1) * PAGE_LENGTH, CURRENT_PAGE * PAGE_LENGTH).toggleClass('page-vi');
+  var b = $('.page-links').get(CURRENT_PAGE - 1);
+      $(b).toggleClass('page-links-lrg');
+}
 
-// create hlinks
+// Add link
 function AddLinks(){
-  var l = $('ul li').length,
-      n = PAGE_LENGTH,
-      m = Math.floor(l/n);  // количество полных старниц
-  if ((l%n) != 0) { m++; } // проверка на неполную страницу в конце
+  var PageNumber = Math.ceil($('li').length / PAGE_LENGTH);
   $('.page-ctrl a').remove();
-  for(var i = 0; i < m; i++) {
-    $("<a/>", {
-      href: "#",
-      "class": "page-links",
-      text: i + 1
-    }).appendTo('.page-ctrl');
+  for (var i = 0; i < PageNumber; i++){
+    // create hlinks
+    $('.page-ctrl').append('<a href="#" class="page-links">'+(i+1)+'</a>');
   }
 }
 
-// show 1 page
+// show linked page
 function PageShow(event) {
   var a = $(event.target).index(),
-      n = PAGE_LENGTH;
-  $('.page-vi').each(function (i) {
-    $(this).toggleClass("page-vi");
-  });
-  $('.new-task').each(function (i) {
-    if (i >= (a * n) && i < (a * n + 5)) {
-      $(this).toggleClass("page-vi");
-    }
-  })
-  PageShowAfter();
+    n = PAGE_LENGTH;
+  CURRENT_PAGE = a + 1;
+  ShowLi();
 }
-
-// show page
-function PageShowAfter() {
-  var a = $('li').index($('.page-vi')[0]),
-      n = PAGE_LENGTH;
-  console.log(a);
-  $('.page-vi').each(function (i) {
-    $(this).toggleClass("page-vi");
-  });
-  $('.new-task').each(function (i) {
-    if (i >= (a) && i < (a + 5)) {
-      $(this).toggleClass("page-vi");
-    }
-  })
-}
-
-
