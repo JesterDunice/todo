@@ -98,3 +98,8 @@ body{
   padding-left: 20px;
   width: 20%;
 }
+
+.page-links:active{
+  color: yellow;
+  background: red;
+}

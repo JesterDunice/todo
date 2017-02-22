@@ -1,4 +1,9 @@
-var lb;
+var lb,
+    PAGE_LENGTH = 5,
+    ALL_TASK = 1,
+    ACTIVE_TASK = 0,
+    COMP_TASK = 0;
+
 
 $(document).ready(function () {
   // input name of task and added after press key "Enter" or button "Add task"
@@ -86,7 +91,8 @@ $(document).ready(function () {
     }
   });
   // show only completed
-  $('#Completed').on('click', function(){
+  $('#Completed').on('click', PageShowCompleted);
+  /*function(){
     $('.hidden-li').each(function (i) {
       $(this).toggleClass("hidden-li");
     });
@@ -95,22 +101,24 @@ $(document).ready(function () {
         $(this).parent().toggleClass("hidden-li");
       }
     });
-  });
+  });*/
   // show only not completed
-  $('#Active').on('click', function(){
+  $('#Active').on('click', PageShowActive);
+  /*function(){
       $('.hidden-li').each(function (i) {
         $(this).toggleClass("hidden-li");
       });
         $('ul input:checked').each(function (i) {
       $(this).parent().toggleClass("hidden-li");
       });
-  });
+  });*/
   // show all
-  $('#All').on('click', function(){
+  $('#All').on('click', PageShowAll);
+  /*function(){
     $('.hidden-li').each(function (i) {
       $(this).toggleClass("hidden-li");
     });
-  });
+  });*/
 
 
   $('#ml').on('click', AddLinks);
@@ -183,11 +191,11 @@ function Counters() {
   $('#all-counter').text("All: " + a);
   $("#comp-counter").text("Completed: " + b);
   $("#notcomp-counter").text("Active: " + c);
-  AddLinks();
-  PageShowAfter();
+  //AddLinks();
+  ShowSwitch();
 };
 
-var PAGE_LENGTH = 5;
+
 
 // create hlinks
 function AddLinks(){
@@ -205,32 +213,133 @@ function AddLinks(){
   }
 }
 
-// show 1 page
+// show link page
 function PageShow(event) {
   var a = $(event.target).index(),
       n = PAGE_LENGTH;
   $('.page-vi').each(function (i) {
     $(this).toggleClass("page-vi");
   });
-  $('.new-task').each(function (i) {
-    if (i >= (a * n) && i < (a * n + 5)) {
-      $(this).toggleClass("page-vi");
-    }
-  })
-  PageShowAfter();
+  if (ALL_TASK === 1) {
+    $('.new-task').each(function (i) {
+      if (i >= (a * n) && i < (a * n + 5)) {
+        $(this).toggleClass("page-vi");
+      }
+    })
+    //PageShowAll();
+  }
+  if (ACTIVE_TASK === 1) {
+    var b = 0,
+        c = a * n;
+    $('ul input:checkbox').each(function (i) {
+      if (i >= (c) && i < (c + 5)) {
+        if (($(this).prop("checked") === false) && (b < 5)) {
+          $(this).parent().toggleClass("page-vi");
+          b++;
+        } else {c++;}
+      }
+    });
+    //PageShowActive();
+  }
+  if (COMP_TASK === 1) {
+    $('ul input:checked').each(function (i) {
+      if (i >= (a * n) && i < (a * n + 5)) {
+        $(this).parent().toggleClass("page-vi");
+      }
+      });
+    //PageShowCompleted();
+  }
 }
 
-// show page
-function PageShowAfter() {
+// show switch function
+function ShowSwitch(){
+  if (ALL_TASK === 1){PageShowAll();}
+  if (ACTIVE_TASK === 1){PageShowActive();}
+  if (COMP_TASK === 1){PageShowCompleted();}
+}
+
+
+// show page All
+function PageShowAll() {
+  ALL_TASK = 1;
+  ACTIVE_TASK = 0;
+  COMP_TASK = 0;
   var a = $('li').index($('.page-vi')[0]),
       n = PAGE_LENGTH;
-  console.log(a);
+  AddLinks();
   $('.page-vi').each(function (i) {
     $(this).toggleClass("page-vi");
   });
   $('.new-task').each(function (i) {
     if (i >= (a) && i < (a + 5)) {
       $(this).toggleClass("page-vi");
+    }
+  })
+}
+
+// show page Completed
+function PageShowCompleted() {
+  ALL_TASK = 0;
+  ACTIVE_TASK = 0;
+  COMP_TASK = 1;
+  var a = $('li').index($('.page-vi')[0]),
+      l = $('ul input:checked').length,
+      n = PAGE_LENGTH,
+      m = Math.floor(l/n);  // количество полных старниц
+  console.log(a);
+  if ((l%n) != 0) { m++; } // проверка на неполную страницу в конце
+  $('.page-ctrl a').remove();
+  for(var i = 0; i < m; i++) {
+    $("<a/>", {
+      href: "#",
+      "class": "page-links",
+      text: i + 1
+    }).appendTo('.page-ctrl');
+  }
+  $('.page-vi').each(function () {
+    $(this).toggleClass("page-vi");
+  });
+  var b = 0;
+  $('.new-task input:checkbox').each(function (i) {
+    if (i >= (a) && i < (a + 5)) {
+      if (($(this).prop("checked") === true) && (b < 5)) {
+        $(this).parent().toggleClass("page-vi");
+        b++;
+      } else {
+        a++;
+      }
+    }
+  });
+}
+
+// show page Active
+function PageShowActive() {
+  ALL_TASK = 0;
+  ACTIVE_TASK = 1;
+  COMP_TASK = 0;
+  var a = $('li').index($('.page-vi')[0]),
+    l = ($('ul input:checkbox').length - $('ul input:checked').length),
+    n = PAGE_LENGTH,
+    m = Math.floor(l/n);  // количество полных старниц
+  if ((l%n) != 0) { m++; } // проверка на неполную страницу в конце
+  $('.page-ctrl a').remove();
+  for(var i = 0; i < m; i++) {
+    $("<a/>", {
+      href: "#",
+      "class": "page-links",
+      text: i + 1
+    }).appendTo('.page-ctrl');
+  }
+  $('.page-vi').each(function (i) {
+    $(this).toggleClass("page-vi");
+  });
+  var b = 0;
+  $('ul input:checkbox').each(function (i) {
+    if (i >= (a) && i < (a + 5)){
+    if (($(this).prop("checked") === false) && (b < 5)) {
+      $(this).parent().toggleClass("page-vi");
+      b++;
+    } else {a++;}
     }
   })
 }
