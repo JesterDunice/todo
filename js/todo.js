@@ -2,9 +2,7 @@ var lb;
 var PAGE_LENGTH = 5;
 var CURRENT_PAGE = 1;
 var PAGE_NUMBER = 0;
-var STATE_ACTIVE = 0;
-var STATE_COMPLETED = 0;
-var STATE_ALL = 1;
+var STATE = "all";          // show state var: "all", "active", "completed"
 
 var tasks = [];
 
@@ -16,7 +14,6 @@ $(document).ready(function () {
       NewTask();
       RenameTasks();
       Counters();
-      // tasks.push({name: "", checked: false, id: ""});
     }
   });
 
@@ -53,7 +50,8 @@ $(document).ready(function () {
   //events on ul
   // delete task
   $('ul').on('click', '.destroy', function () {
-    $(this).parent().remove();
+    var a = $(this).parent().index();
+    tasks.splice(a, 1);
     // reset ctrl checkbox to unchecked
     if ($('ul input:checkbox').length === 0) {
       $('#ctrl-cb').prop("checked", false);
@@ -68,7 +66,11 @@ $(document).ready(function () {
 
   // delete all completed tasks
   $('#del-completed').click(function () {
-    $('.todo-list input:checked').parent().remove();
+    $('.todo-list input:checked').each(function () {
+      var a = $(this).parent().index();
+      console.log(a);
+      tasks.splice(a, 1);
+    })
     // reset ctrl checkbox to unchecked
     if ($('ul input:checkbox').length === 0) {
       $('#ctrl-cb').prop("checked", false);
@@ -99,11 +101,11 @@ $(document).ready(function () {
   });
   // show only completed
   $('#Completed').on('click', SetCurPage);
-  $('#Completed').on('click', ShowCompl);
+ // $('#Completed').on('click', ShowCompl);
 
   // show only not completed
   $('#Active').on('click', SetCurPage);
-  $('#Active').on('click', ShowActive);
+  //$('#Active').on('click', ShowActive);
 
   // show all
   //$('#All').on('click', SetCurPage);
@@ -113,115 +115,72 @@ $(document).ready(function () {
   $('.page-links-list').on('click', '.page-links', PageShow);
 
   // arrows links
-  $('.page-ctrl').on('click', '.border-links', PageShowArrows);
+ // $('.page-ctrl').on('click', '.border-links', PageShowArrows);
 
 });
 
 // add new task
 function NewTask() {
-  $("<li/>", {
-    "class": "new-task"
-  }).appendTo('.todo-list')
-    .append(
-      $("<input/>", {
-        "class": "cb",
-        type: "checkbox"
-      }),
-      $("<label/>", {
-        "class": "label-task",
-        text: $("#search").val()
-      }),
-      $("<button/>", {
-        "class": "destroy",
-        text: "x"
-      }))
+  tasks.push({name: $("#search").val(), checked: false, id: 'fred' + (tasks.length + 1)});
   //clear input text area
   $('#search').val('');
 }
 
 function RenameTasks() {
-  tasks = [];
-  $('li').each(function(i){
+  $(tasks).each(function(i){
     $(this).attr("id", "fred-" + (i + 1));
-    tasks.push({name: "all" + (i + 1), checked: $(this).children('.cb').prop('checked'), id: this.id});
 });
 }
 
 function CtrlCheck() {
-  if ($('ul input:checked').length === $('ul input:checkbox').length) {
-    $('#ctrl-cb').prop("checked", true);
-  } else {
-    $('#ctrl-cb').prop("checked", false);
-  }
-  Counters();
+  var a = $(this).parent().index();
+  console.log(a);
+  $(tasks[a]).attr('checked', true);
+  //Counters();
 }
 
 function Counters() {
-  var a = $('ul input:checkbox').length,
-    b = $('ul input:checked').length,
-    c = $('ul input:not(:checked)').length;
+  var a = tasks.length,
+      b = 0,
+      c = 0;
+  tasks.forEach(function (task) {
+    if (task.checked === true){ b++;}
+    else {c++;}
+  });
+
   $('#all-counter').text("All: " + a);
   $("#comp-counter").text("Completed: " + b);
   $("#notcomp-counter").text("Active: " + c);
+
+  if (b === a && b != 0){$('#ctrl-cb').prop("checked", true);}
+  else {$('#ctrl-cb').prop("checked", false);}
   //AddLinks();
-  SwitchShow();
+  //SwitchShow();
+  ShowLi();
 };
-
-// show numeric linked page
-function PageShow(event) {
-  var a = $(event.target).index(),
-    n = PAGE_LENGTH;
-  CURRENT_PAGE = a + 1;
-  if (STATE_ALL === 1){ShowLi();}
-  else if (STATE_ACTIVE === 1){ShowActive();}
-  else if (STATE_COMPLETED === 1){ShowCompl();}
-}
-
-// show arrows linked page
-function PageShowArrows() {
-  var a = $(event.target).attr('id'),
-    n = PAGE_LENGTH;
-  switch (a) {
-    case 'first':
-      CURRENT_PAGE = 1;
-      break;
-    case 'prev':
-      if (CURRENT_PAGE > 1){
-        CURRENT_PAGE = CURRENT_PAGE - 1;
-      } else {CURRENT_PAGE = 1;}
-      break;
-    case 'next':
-      if (CURRENT_PAGE < PAGE_NUMBER){
-        CURRENT_PAGE = CURRENT_PAGE + 1;
-      } else {CURRENT_PAGE = PAGE_NUMBER;}
-      break;
-    case 'last':
-      CURRENT_PAGE = PAGE_NUMBER;
-  }
-  if (STATE_ALL === 1){ShowLi();}
-  else if (STATE_ACTIVE === 1){ShowActive();}
-  else if (STATE_COMPLETED === 1){ShowCompl();}
-}
-
-// show current state
-function SwitchShow() {
-  if (STATE_ALL === 1){ShowLi();}
-  else if (STATE_ACTIVE === 1){ShowActive();}
-  else if (STATE_COMPLETED === 1){ShowCompl();}
-  $('.hidden-bl').toggleClass("hidden-bl");
-  if (!(PAGE_NUMBER > 1)){$('.border-links').toggleClass("hidden-bl")}
-}
 
 // set current page
 function SetCurPage() {
   CURRENT_PAGE = 1;
 }
 
+// show numeric linked page
+function PageShow(event) {
+  var a = $(event.target).index(),
+    n = PAGE_LENGTH;
+  CURRENT_PAGE = a + 1;
+  ShowLi();
+}
+
 // show current page
 function ShowLi() {
   // Add link
-  PAGE_NUMBER = Math.ceil($('li').length / PAGE_LENGTH);
+  PAGE_NUMBER = Math.ceil($(tasks).length / PAGE_LENGTH);
+  if ($('.new-task').length === 0 && (CURRENT_PAGE > 1)) {
+    CURRENT_PAGE--;
+  }
   $('.page-links-list a').remove();
+  $('li').remove();
   if (PAGE_NUMBER > 1) {
     for (var i = 0; i < PAGE_NUMBER; i++) {
       // create hlinks
@@ -230,69 +189,38 @@ function ShowLi() {
   }
 
   $('.page-links-lrg').toggleClass('page-links-lrg');
-  if ($('.page-vi').length === 0 && (CURRENT_PAGE > 1)) {
-    CURRENT_PAGE--;
-  }
-  $('.page-vi').toggleClass('page-vi');
-  $('li').slice((CURRENT_PAGE - 1) * PAGE_LENGTH, CURRENT_PAGE * PAGE_LENGTH).toggleClass('page-vi');
+
+  //$('.page-vi').toggleClass('page-vi');
+  tasks.slice((CURRENT_PAGE - 1) * PAGE_LENGTH, CURRENT_PAGE * PAGE_LENGTH).forEach(function (task) {
+    var a = false;
+    if (task.checked === true){a = true}
+    else {a = false}
+    $("<li/>", {
+      "class": "new-task"
+    }).appendTo('.todo-list')
+      .append(
+        $("<input/>", {
+          "class": "cb",
+          type: "checkbox",
+          checked: a
+        }),
+        $("<label/>", {
+          "class": "label-task",
+          text: task.name
+        }),
+        $("<button/>", {
+          "class": "destroy",
+          text: "x"
+        }))
+  });
+
+
   var b = $('.page-links').get(CURRENT_PAGE - 1);
   $(b).toggleClass('page-links-lrg');
 
-  STATE_ACTIVE = 0;
-  STATE_COMPLETED = 0;
-  STATE_ALL = 1;
+  STATE = "all";
 }
 
-// show all completed
-function ShowCompl() {
-  // Add link
-  PAGE_NUMBER = Math.ceil($('ul input:checked').length / PAGE_LENGTH);
-  $('.page-links-list a').remove();
-  if (PAGE_NUMBER > 1) {
-    for (var i = 0; i < PAGE_NUMBER; i++) {
-      // create hlinks
-      $('.page-links-list').append('<a href="#" class="page-links">' + (i + 1) + '</a>');
-    }
-  }
-  $('.page-links-lrg').toggleClass('page-links-lrg');
-  if ($('.page-vi').length === 0 && (CURRENT_PAGE > 1)) {
-    CURRENT_PAGE--;
-  }
-  $('.page-vi').toggleClass('page-vi');
-  $('ul input:checked').slice((CURRENT_PAGE - 1) * PAGE_LENGTH, CURRENT_PAGE * PAGE_LENGTH).parent().toggleClass('page-vi');
-  var b = $('.page-links').get(CURRENT_PAGE - 1);
-  $(b).toggleClass('page-links-lrg');
-
-  STATE_ACTIVE = 0;
-  STATE_COMPLETED = 1;
-  STATE_ALL = 0;
-}
-
-// show all active
-function ShowActive() {
-  // Add link
-  PAGE_NUMBER = Math.ceil($('ul input:not(:checked)').length / PAGE_LENGTH);
-  $('.page-links-list a').remove();
-  if (PAGE_NUMBER > 1) {
-    for (var i = 0; i < PAGE_NUMBER; i++) {
-      // create hlinks
-      $('.page-links-list').append('<a href="#" class="page-links">' + (i + 1) + '</a>');
-    }
-  }
-
-  $('.page-links-lrg').toggleClass('page-links-lrg');
-  if ($('.page-vi').length === 0 && (CURRENT_PAGE > 1)) {
-    CURRENT_PAGE--;
-  }
-  $('.page-vi').toggleClass('page-vi');
-  $('ul input:not(:checked)').slice((CURRENT_PAGE - 1) * PAGE_LENGTH, CURRENT_PAGE * PAGE_LENGTH).parent().toggleClass('page-vi');
-  var b = $('.page-links').get(CURRENT_PAGE - 1);
-  $(b).toggleClass('page-links-lrg');
-
-  STATE_ACTIVE = 1;
-  STATE_COMPLETED = 0;
-  STATE_ALL = 0;
-}
 
 
 
