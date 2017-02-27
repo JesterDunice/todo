@@ -41,7 +41,7 @@ $(document).ready(function () {
     Counters()
   });
 
-  // add task
+  // add task button
   $('#add-task').click(function () {
     if ($("#search").val() != '') {
       NewTask();
@@ -65,6 +65,7 @@ $(document).ready(function () {
   });
   // check/uncheck ctrl checkbox
   $('ul').on('click', '.cb', CtrlCheck);
+
   // delete all completed tasks
   $('#del-completed').click(function () {
     $('.todo-list input:checked').parent().remove();
@@ -99,43 +100,16 @@ $(document).ready(function () {
   // show only completed
   $('#Completed').on('click', SetCurPage);
   $('#Completed').on('click', ShowCompl);
-  /*function(){
-    $('.hidden-li').each(function (i) {
-      $(this).toggleClass("hidden-li");
-    });
-    $('ul input:checkbox').each(function (i) {
-      if ($(this).prop("checked") === false){
-        $(this).parent().toggleClass("hidden-li");
-      }
-    });
-  });*/
+
   // show only not completed
   $('#Active').on('click', SetCurPage);
   $('#Active').on('click', ShowActive);
-  /*function(){
-      $('.hidden-li').each(function (i) {
-        $(this).toggleClass("hidden-li");
-      });
-        $('ul input:checked').each(function (i) {
-      $(this).parent().toggleClass("hidden-li");
-      });
-  });*/
+
   // show all
   //$('#All').on('click', SetCurPage);
   $('#All').on('click', ShowLi);
-  /* function(){
-    $('.hidden-li').each(function (i) {
-      $(this).toggleClass("hidden-li");
-    });
-  }); */
 
-
-  $('#ml').on('click', function () {
-    {CURRENT_PAGE = 1;}
-  }, ShowCompl);
-
-
-  // numbers links
+  // numeric links
   $('.page-links-list').on('click', '.page-links', PageShow);
 
   // arrows links
@@ -166,8 +140,10 @@ function NewTask() {
 }
 
 function RenameTasks() {
+  tasks = [];
   $('li').each(function(i){
     $(this).attr("id", "fred-" + (i + 1));
+    tasks.push({name: "all" + (i + 1), checked: $(this).children('.cb').prop('checked'), id: this.id});
 });
 }
 
@@ -183,7 +159,7 @@ function CtrlCheck() {
 function Counters() {
   var a = $('ul input:checkbox').length,
     b = $('ul input:checked').length,
-    c = a - b;
+    c = $('ul input:not(:checked)').length;
   $('#all-counter').text("All: " + a);
   $("#comp-counter").text("Completed: " + b);
   $("#notcomp-counter").text("Active: " + c);
@@ -191,7 +167,7 @@ function Counters() {
   SwitchShow();
 };
 
-// show numbers linked page
+// show numeric linked page
 function PageShow(event) {
   var a = $(event.target).index(),
     n = PAGE_LENGTH;
@@ -229,13 +205,11 @@ function PageShowArrows() {
 
 // show current state
 function SwitchShow() {
-  $('.hidden-bl').toggleClass("hidden-bl");
-  if (PAGE_NUMBER > 1){
-
-  } else {$('.border-links').toggleClass("hidden-bl")}
   if (STATE_ALL === 1){ShowLi();}
   else if (STATE_ACTIVE === 1){ShowActive();}
   else if (STATE_COMPLETED === 1){ShowCompl();}
+  $('.hidden-bl').toggleClass("hidden-bl");
+  if (!(PAGE_NUMBER > 1)){$('.border-links').toggleClass("hidden-bl")}
 }
 
 // set current page
