@@ -1,7 +1,9 @@
 var lb;
 var PAGE_LENGTH = 5;
 var CURRENT_PAGE = 1;
-
+var STATE_ACTIVE = 0;
+var STATE_COMPLETED = 0;
+var STATE_ALL = 1;
 $(document).ready(function () {
   // input name of task and added after press key "Enter" or button "Add task"
   $("#search").keyup(function (event) {
@@ -89,7 +91,9 @@ $(document).ready(function () {
     }
   });
   // show only completed
-  $('#Completed').on('click', function(){
+  $('#Completed').on('click', SetCurPage);
+  $('#Completed').on('click', ShowCompl);
+  /*function(){
     $('.hidden-li').each(function (i) {
       $(this).toggleClass("hidden-li");
     });
@@ -98,25 +102,31 @@ $(document).ready(function () {
         $(this).parent().toggleClass("hidden-li");
       }
     });
-  });
+  });*/
   // show only not completed
-  $('#Active').on('click', function(){
+  $('#Active').on('click', SetCurPage);
+  $('#Active').on('click', ShowActive);
+  /*function(){
       $('.hidden-li').each(function (i) {
         $(this).toggleClass("hidden-li");
       });
         $('ul input:checked').each(function (i) {
       $(this).parent().toggleClass("hidden-li");
       });
-  });
+  });*/
   // show all
-  $('#All').on('click', function(){
+  //$('#All').on('click', SetCurPage);
+  $('#All').on('click', ShowLi);
+  /* function(){
     $('.hidden-li').each(function (i) {
       $(this).toggleClass("hidden-li");
     });
-  });
+  }); */
 
 
-  $('#ml').on('click', AddLinks);
+  $('#ml').on('click', function () {
+    {CURRENT_PAGE = 1;}
+  }, ShowCompl);
 
 
   //pageshow
@@ -168,12 +178,44 @@ function Counters() {
   $('#all-counter').text("All: " + a);
   $("#comp-counter").text("Completed: " + b);
   $("#notcomp-counter").text("Active: " + c);
-  AddLinks();
-  ShowLi();
+  //AddLinks();
+  SwitchShow();
 };
+
+// show linked page
+function PageShow(event) {
+  var a = $(event.target).index(),
+    n = PAGE_LENGTH;
+  CURRENT_PAGE = a + 1;
+  if (STATE_ALL === 1){ShowLi();}
+  else if (STATE_ACTIVE === 1){ShowActive();}
+  else if (STATE_COMPLETED === 1){ShowCompl();}
+}
+
+// show current state
+function SwitchShow() {
+  if (STATE_ALL === 1){ShowLi();}
+  else if (STATE_ACTIVE === 1){ShowActive();}
+  else if (STATE_COMPLETED === 1){ShowCompl();}
+}
+
+// set current page
+function SetCurPage() {
+  CURRENT_PAGE = 1;
+}
 
 // show current page
 function ShowLi() {
+  // Add link
+  var PageNumber = Math.ceil($('li').length / PAGE_LENGTH);
+  $('.page-ctrl a').remove();
+  if (PageNumber > 1) {
+    for (var i = 0; i < PageNumber; i++) {
+      // create hlinks
+      $('.page-ctrl').append('<a href="#" class="page-links">' + (i + 1) + '</a>');
+    }
+  }
+
   $('.page-links-lrg').toggleClass('page-links-lrg');
   if ($('.page-vi').length === 0 && (CURRENT_PAGE > 1)) {
     CURRENT_PAGE--;
@@ -181,23 +223,62 @@ function ShowLi() {
   $('.page-vi').toggleClass('page-vi');
   $('li').slice((CURRENT_PAGE - 1) * PAGE_LENGTH, CURRENT_PAGE * PAGE_LENGTH).toggleClass('page-vi');
   var b = $('.page-links').get(CURRENT_PAGE - 1);
-      $(b).toggleClass('page-links-lrg');
+  $(b).toggleClass('page-links-lrg');
+
+  STATE_ACTIVE = 0;
+  STATE_COMPLETED = 0;
+  STATE_ALL = 1;
 }
 
-// Add link
-function AddLinks(){
-  var PageNumber = Math.ceil($('li').length / PAGE_LENGTH);
+// show all completed
+function ShowCompl() {
+  // Add link
+  var PageNumber = Math.ceil($('ul input:checked').length / PAGE_LENGTH);
   $('.page-ctrl a').remove();
-  for (var i = 0; i < PageNumber; i++){
-    // create hlinks
-    $('.page-ctrl').append('<a href="#" class="page-links">'+(i+1)+'</a>');
+  if (PageNumber > 1) {
+    for (var i = 0; i < PageNumber; i++) {
+      // create hlinks
+      $('.page-ctrl').append('<a href="#" class="page-links">' + (i + 1) + '</a>');
+    }
   }
+  $('.page-links-lrg').toggleClass('page-links-lrg');
+  if ($('ul input:checked').length === 0 && (CURRENT_PAGE > 1)) {
+    CURRENT_PAGE--;
+  }
+  $('.page-vi').toggleClass('page-vi');
+  $('ul input:checked').slice((CURRENT_PAGE - 1) * PAGE_LENGTH, CURRENT_PAGE * PAGE_LENGTH).parent().toggleClass('page-vi');
+  var b = $('.page-links').get(CURRENT_PAGE - 1);
+  $(b).toggleClass('page-links-lrg');
+
+  STATE_ACTIVE = 0;
+  STATE_COMPLETED = 1;
+  STATE_ALL = 0;
 }
 
-// show linked page
-function PageShow(event) {
-  var a = $(event.target).index(),
-    n = PAGE_LENGTH;
-  CURRENT_PAGE = a + 1;
-  ShowLi();
+// show all active
+function ShowActive() {
+  // Add link
+  var PageNumber = Math.ceil($('ul input:not(:checked)').length / PAGE_LENGTH);
+  $('.page-ctrl a').remove();
+  if (PageNumber > 1) {
+    for (var i = 0; i < PageNumber; i++) {
+      // create hlinks
+      $('.page-ctrl').append('<a href="#" class="page-links">' + (i + 1) + '</a>');
+    }
+  }
+
+  $('.page-links-lrg').toggleClass('page-links-lrg');
+  if ($('ul input:not(:checked)').length === 0 && (CURRENT_PAGE > 1)) {
+    CURRENT_PAGE--;
+  }
+  $('.page-vi').toggleClass('page-vi');
+  $('ul input:not(:checked)').slice((CURRENT_PAGE - 1) * PAGE_LENGTH, CURRENT_PAGE * PAGE_LENGTH).parent().toggleClass('page-vi');
+  var b = $('.page-links').get(CURRENT_PAGE - 1);
+  $(b).toggleClass('page-links-lrg');
+
+  STATE_ACTIVE = 1;
+  STATE_COMPLETED = 0;
+  STATE_ALL = 0;
 }
+
+
