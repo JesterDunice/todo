@@ -103,3 +103,11 @@ body{
 .page-links-lrg{
   font-size: 50px;
 }
+
+border-links{
+
+}
+
+.hidden-bl{
+  display: none;
+}
