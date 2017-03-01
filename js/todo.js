@@ -302,13 +302,12 @@ function Show() {
   });
   // show/hide arrows links
   $('.hidden-bl').toggleClass("hidden-bl");
-  if (!(PAGE_NUMBER > 1)) {
+  if (PAGE_NUMBER === 1) {
     $('.border-links').toggleClass("hidden-bl");
   }
   // make large font for active numeric link
   var b = $('.page-links').get(CURRENT_PAGE - 1);
   $(b).toggleClass('page-links-lrg');
-  console.log(QUANTITY_SHOW);
 }
 
 // calc PAGE_NUMBER by STATE
