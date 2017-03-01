@@ -187,7 +187,7 @@ function Counters() {
     $('#ctrl-cb').prop("checked", false);
   }
   Show();
-};
+}
 
 // set show state functions
 function SetShowAll() {
@@ -212,8 +212,7 @@ function SetCurPage() {
 
 // show numeric linked page
 function PageShow(event) {
-  var a = $(event.target).index(),
-    n = PAGE_LENGTH;
+  var a = $(event.target).index();
   CURRENT_PAGE = a + 1;
   Show();
 }
@@ -325,7 +324,7 @@ function PageNumFinder() {
         if (task.checked === false) {
           b++;
         }
-      })
+      });
       a = Math.ceil(b / PAGE_LENGTH);
       break;
     case 'completed':
@@ -334,7 +333,7 @@ function PageNumFinder() {
         if (task.checked === true) {
           c++;
         }
-      })
+      });
       a = Math.ceil(c / PAGE_LENGTH);
   }
   return a;
