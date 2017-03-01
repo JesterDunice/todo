@@ -1,8 +1,9 @@
 var lb;
-var lb_ind = -1;
+var lb_id;
 var PAGE_LENGTH = 5;
 var CURRENT_PAGE = 1;
 var PAGE_NUMBER = 0;
+var QUANTITY_SHOW = 0;
 var STATE = "all";          // show state var: "all", "active", "completed"
 var tasks = [];
 
@@ -55,11 +56,12 @@ $(document).ready(function () {
   $('ul').on('click', '.destroy', function () {
     var a = $(this).parent().attr('id');
     tasks.forEach(function (task, i) {
-      if (task.id === a){
+      if (task.id === a) {
         a = i;
       }
     });
     tasks.splice(a, 1);
+    QUANTITY_SHOW--;
     RenameTasks();
     Counters();
   });
@@ -70,28 +72,33 @@ $(document).ready(function () {
   $('#del-completed').click(function () {
     var a = tasks.length;
     for (var i = 0; i < a; i++)
-      if (tasks[i].checked === true){
-      tasks.splice(i, 1);
-      i--;
-      a--;
-     }
+      if (tasks[i].checked === true) {
+        tasks.splice(i, 1);
+        i--;
+        a--;
+      }
+    SetCurPage();
     RenameTasks();
     Counters();
   });
-    // reset ctrl checkbox to unchecked
-      //RenameTasks();
+  // reset ctrl checkbox to unchecked
+  //RenameTasks();
 
   // rename after dbclk on name of task
   $('ul').on('dblclick', '.label-task', function () {
     //window.lb = $('.label-task').index(this);
     window.lb = $(this);
-    window.lb_ind = $(this).parent().index() + (CURRENT_PAGE - 1) * PAGE_LENGTH;
+    window.lb_id = $(this).parent().attr('id');
     $(this).attr("contenteditable", true);
     $(this).focus();
     $('.label-task').keydown(function (event) {
       if ((event.keyCode == 13)) {
         $(window.lb).attr("contenteditable", false);
-        tasks[window.lb_ind].name = $(window.lb).text();
+        tasks.forEach(function (task) {
+          if (task.id === window.lb_id) {
+            task.name = $(window.lb).text();
+          }
+        });
       }
     });
   });
@@ -101,9 +108,11 @@ $(document).ready(function () {
     if (!$(lab).is(event.target)                 // если клик был не по нашему блоку
       && $(lab).has(event.target).length === 0) { // и не по его дочерним элементам
       $(lab).attr("contenteditable", false); // меняем его аттрибут
-      if (window.lb_ind > -1) {
-        tasks[window.lb_ind].name = $(window.lb).text();
-      }
+      tasks.forEach(function (task) {
+        if (task.id === window.lb_id) {
+          task.name = $(window.lb).text();
+        }
+      });
     }
   });
   // show only completed
@@ -134,7 +143,7 @@ function NewTask() {
 }
 
 function RenameTasks() {
-  tasks.forEach(function(task, i){
+  tasks.forEach(function (task, i) {
     task.id = "fred-" + (i + 1);
   });
 }
@@ -143,12 +152,12 @@ function CtrlCheck() {
   //var a = ($(this).parent().index()) + (CURRENT_PAGE - 1) * PAGE_LENGTH;
   var a = $(this).parent().attr('id');
   tasks.forEach(function (task) {
-    if (task.id === a){
-    if (task.checked === false) {
-      $(task).attr('checked', true);
-    } else {
-      $(task).attr('checked', false);
-    }
+    if (task.id === a) {
+      if (task.checked === false) {
+        $(task).attr('checked', true);
+      } else {
+        $(task).attr('checked', false);
+      }
     }
   });
   Counters();
@@ -156,34 +165,42 @@ function CtrlCheck() {
 
 function Counters() {
   var a = tasks.length,
-      b = 0,
-      c = 0;
+    b = 0,
+    c = 0;
   tasks.forEach(function (task) {
-    if (task.checked === true){ b++;}
-    else {c++;}
+    if (task.checked === true) {
+      b++;
+    }
+    else {
+      c++;
+    }
   });
 
   $('#all-counter').text("All: " + a);
   $("#comp-counter").text("Completed: " + b);
   $("#notcomp-counter").text("Active: " + c);
 
-  if (b === a && b != 0){$('#ctrl-cb').prop("checked", true);}
-  else {$('#ctrl-cb').prop("checked", false);}
+  if (b === a && b != 0) {
+    $('#ctrl-cb').prop("checked", true);
+  }
+  else {
+    $('#ctrl-cb').prop("checked", false);
+  }
   Show();
 };
 
 // set show state functions
-function SetShowAll(){
+function SetShowAll() {
   STATE = "all";
   Show();
 }
 
-function SetShowCompleted(){
+function SetShowCompleted() {
   STATE = "completed";
   Show();
 }
 
-function SetShowActive(){
+function SetShowActive() {
   STATE = "active";
   Show();
 }
@@ -209,14 +226,18 @@ function PageShowArrows() {
       CURRENT_PAGE = 1;
       break;
     case 'prev':
-      if (CURRENT_PAGE > 1){
+      if (CURRENT_PAGE > 1) {
         CURRENT_PAGE = CURRENT_PAGE - 1;
-      } else {CURRENT_PAGE = 1;}
+      } else {
+        CURRENT_PAGE = 1;
+      }
       break;
     case 'next':
-      if (CURRENT_PAGE < PAGE_NUMBER){
+      if (CURRENT_PAGE < PAGE_NUMBER) {
         CURRENT_PAGE = CURRENT_PAGE + 1;
-      } else {CURRENT_PAGE = PAGE_NUMBER;}
+      } else {
+        CURRENT_PAGE = PAGE_NUMBER;
+      }
       break;
     case 'last':
       CURRENT_PAGE = PAGE_NUMBER;
@@ -227,10 +248,10 @@ function PageShowArrows() {
 // show current page
 function Show() {
   var checked_state = false,
-      count = 0;
-    PAGE_NUMBER = PageNumFinder();
+    count = 0;
+  PAGE_NUMBER = PageNumFinder();
   // Add link
-  if ($('.new-task').length <= 1 && (CURRENT_PAGE > 1)) {
+  if (QUANTITY_SHOW === 0 && (CURRENT_PAGE > 1)) {
     CURRENT_PAGE--;
   }
   // delete old links
@@ -242,10 +263,10 @@ function Show() {
       $('.page-links-list').append('<a href="#" class="page-links">' + (i + 1) + '</a>');
     }
   }
-
+  QUANTITY_SHOW = 0;
 
   tasks.forEach(function (task) {
-    switch (STATE){
+    switch (STATE) {
       case 'all':
         checked_state = task.checked;
         break;
@@ -275,29 +296,33 @@ function Show() {
               "class": "destroy",
               text: "x"
             }));
+        QUANTITY_SHOW++;
       }
       count++;
     }
   });
   // show/hide arrows links
   $('.hidden-bl').toggleClass("hidden-bl");
-  if (!(PAGE_NUMBER > 1)){$('.border-links').toggleClass("hidden-bl");}
+  if (!(PAGE_NUMBER > 1)) {
+    $('.border-links').toggleClass("hidden-bl");
+  }
   // make large font for active numeric link
   var b = $('.page-links').get(CURRENT_PAGE - 1);
   $(b).toggleClass('page-links-lrg');
+  console.log(QUANTITY_SHOW);
 }
 
 // calc PAGE_NUMBER by STATE
-function PageNumFinder(){
+function PageNumFinder() {
   var a;
-  switch (STATE){
+  switch (STATE) {
     case 'all':
       a = Math.ceil($(tasks).length / PAGE_LENGTH);
       break;
     case 'active':
       var b = 0;
       tasks.forEach(function (task) {
-        if (task.checked === false){
+        if (task.checked === false) {
           b++;
         }
       })
@@ -306,7 +331,7 @@ function PageNumFinder(){
     case 'completed':
       var c = 0;
       tasks.forEach(function (task) {
-        if (task.checked === true){
+        if (task.checked === true) {
           c++;
         }
       })
